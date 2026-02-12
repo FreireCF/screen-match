@@ -1,6 +1,6 @@
 package br.com.alura.sreenmatch.models;
 
-public record TituloOmbd(String title, String year, String runtime) {
+public record TitleOmbd(String title, String year, String runtime) {
 
     @Override
     public String toString(){

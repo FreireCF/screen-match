@@ -1,7 +1,7 @@
 package br.com.alura;
 
-import br.com.alura.sreenmatch.models.Titulo;
-import br.com.alura.sreenmatch.models.TituloOmbd;
+import br.com.alura.sreenmatch.models.Title;
+import br.com.alura.sreenmatch.models.TitleOmbd;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -19,15 +19,15 @@ public class Main {
             var scanner = new Scanner(System.in);
 
             System.out.println("\nFilme para busca: ");
-            var filme = scanner.nextLine();
+            var movie = scanner.nextLine();
 
             //var apiKey = "sua chave de api aqui"
             var apiKey = System.getenv("API_KEY_SCREEN_MATCH");
-            var endereco = "http://www.omdbapi.com/?t=" + filme + "&apikey=" +apiKey;
+            var adress = "http://www.omdbapi.com/?t=" + movie + "&apikey=" +apiKey;
 
             HttpClient client = HttpClient.newHttpClient(); //iniciliza o HttpClient (faz a requisição)
             HttpRequest request = HttpRequest.newBuilder() //construtor para uma Classe muito complexa
-                    .uri(URI.create(endereco))
+                    .uri(URI.create(adress))
                     .build();
 
             //client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
@@ -42,18 +42,16 @@ public class Main {
             System.out.println(json);
 
             Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
-            var f = gson.fromJson(json, TituloOmbd.class); //usado apenas para carregar os dados
+            var temp = gson.fromJson(json, TitleOmbd.class); //usado apenas para carregar os dados
 
-            var t = new Titulo(f); //conversão de tipo de objeto
+            var title = new Title(temp); //conversão de tipo de objeto
 
             //System.out.println("\nTítulo: "+f.getNome() + " (" + f.getAnoLancamento()+ ")");
             //System.out.println("\nDiretor: "+f.getDiretor());
 
-            //System.out.println(f);
+            //System.out.println(temp);
             System.out.println("\nApós conversão");
-            System.out.println(t);
-
-
+            System.out.println(title);
         }
     }
 }

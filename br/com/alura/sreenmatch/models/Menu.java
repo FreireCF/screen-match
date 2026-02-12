@@ -4,7 +4,7 @@ public class Menu {
 
     public Menu(){}
 
-    public void exibir(){
+    public void display(){
         System.out.println("\n_____________MENU______________");
         System.out.println("| [1]  - CADASTRAR FILME         |");
         System.out.println("| [2]  - CADASTRAR SÉRIE         |");
