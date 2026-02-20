@@ -1,5 +1,6 @@
 package br.com.alura;
 
+import br.com.alura.screenmatch.exceptions.ErroConversaoDeAnoException;
 import br.com.alura.sreenmatch.models.Title;
 import br.com.alura.sreenmatch.models.TitleOmbd;
 import com.google.gson.FieldNamingPolicy;
@@ -19,39 +20,40 @@ public class Main {
             var scanner = new Scanner(System.in);
 
             System.out.println("\nFilme para busca: ");
-            var movie = scanner.nextLine();
+            var titleToSearch = scanner.nextLine();
 
             //var apiKey = "sua chave de api aqui"
             var apiKey = System.getenv("API_KEY_SCREEN_MATCH");
-            var adress = "http://www.omdbapi.com/?t=" + movie + "&apikey=" +apiKey;
+            var adress = "http://www.omdbapi.com/?t=" + String.valueOf(titleToSearch.replace(" ", "+")) + "&apikey=" +apiKey;
 
-            HttpClient client = HttpClient.newHttpClient(); //iniciliza o HttpClient (faz a requisição)
-            HttpRequest request = HttpRequest.newBuilder() //construtor para uma Classe muito complexa
-                    .uri(URI.create(adress))
-                    .build();
+            try{
+                HttpClient client = HttpClient.newHttpClient(); //iniciliza o HttpClient (faz a requisição)
+                HttpRequest request = HttpRequest.newBuilder().uri(URI.create(adress)).build(); //construtor para uma Classe muito complexa
 
-            //client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-            //.thenApply(HttpResponse::body)
-            //.thenAccept(System.out::println)
-            //.join();
+                //client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                //.thenApply(HttpResponse::body)
+                //.thenAccept(System.out::println)
+                //.join();
 
-            HttpResponse<String> response = client //recebe a resposta da requisição
-                    .send(request, HttpResponse.BodyHandlers.ofString());
+                HttpResponse<String> response = client //recebe a resposta da requisição
+                        .send(request, HttpResponse.BodyHandlers.ofString());
 
-            var json = response.body();
-            System.out.println(json);
+                var json = response.body();
+                //System.out.println(json);
 
-            Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
-            var temp = gson.fromJson(json, TitleOmbd.class); //usado apenas para carregar os dados
+                Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE).create();
+                var temp = gson.fromJson(json, TitleOmbd.class); //usado apenas para carregar os dados
 
-            var title = new Title(temp); //conversão de tipo de objeto
-
-            //System.out.println("\nTítulo: "+f.getNome() + " (" + f.getAnoLancamento()+ ")");
-            //System.out.println("\nDiretor: "+f.getDiretor());
-
-            //System.out.println(temp);
-            System.out.println("\nApós conversão");
-            System.out.println(title);
+                var title = new Title(temp); //conversão de tipo de objeto
+                System.out.println(title);
+            } catch (NumberFormatException e) {
+                System.out.println("\nErro encontrado: "+e.getMessage());
+            } catch (IllegalArgumentException e){
+                System.out.println("\nErro de argumento: "+e.getMessage());
+            } catch (ErroConversaoDeAnoException e){
+                System.out.println(e.getMessage());
+            }
+            System.out.println("\nFinalizado corretamente");
         }
     }
 }

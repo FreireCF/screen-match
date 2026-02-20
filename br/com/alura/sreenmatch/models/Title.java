@@ -1,5 +1,7 @@
 package br.com.alura.sreenmatch.models;
 
+import br.com.alura.screenmatch.exceptions.ErroConversaoDeAnoException;
+
 public class Title implements Comparable<Title>{
     //@SerializedName("Title") //não é recomendado, pouquíssima flexibilidade
     private String name;
@@ -20,16 +22,19 @@ public class Title implements Comparable<Title>{
         this.isInPlan = isInPlan;
     }
 
-    public Title(String nome, int anoLancamento, boolean incluidoNoPlano){ //gambiarra de um construturo p SÉRIE. não é relevante no momento
-        this.name = nome;
-        this.year = anoLancamento;
-        this.isInPlan = incluidoNoPlano;
+    public Title(String name, int runtime, boolean isInPlan){
+        this.name = name;
+        this.runtime = runtime;
+        this.isInPlan = isInPlan;
     }
 
-    public Title(TitleOmbd t){
+    public Title(TitleOmbd t) {
         this.name = t.title();
-        this.year = Integer.valueOf(t.year()); //converter String year para int anoLancamento
-        this.runtime = Integer.valueOf(t.runtime().substring(0, 3));
+        if (t.year().length() > 4) {
+            throw new ErroConversaoDeAnoException("Não converteu o ano porque tem mais de 4 caracteres");
+        }
+            this.year = Integer.valueOf(t.year()); //converter String year para int anoLancamento
+            this.runtime = Integer.valueOf(t.runtime().substring(0, 3));
     }
 
     public String getName() {
