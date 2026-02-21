@@ -1,8 +1,10 @@
 package br.com.alura;
 
 import br.com.alura.screenmatch.exceptions.ErroConversaoDeAnoException;
+import br.com.alura.sreenmatch.models.OmdbService;
 import br.com.alura.sreenmatch.models.Title;
 import br.com.alura.sreenmatch.models.TitleOmbd;
+import br.com.alura.sreenmatch.models.Writer;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -21,15 +23,10 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
-        var scanner = new Scanner(System.in);
-        var apiKey = System.getenv("API_KEY_SCREEN_MATCH");
-        var titleToSearch = "";
-
         List<Title> titles = new LinkedList<>();
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.UPPER_CAMEL_CASE)
-                .setPrettyPrinting()
-                .create();
+        var apiResponse = new OmdbService();
+        var scanner = new Scanner(System.in);
+        var titleToSearch = "";
 
         while (!titleToSearch.equalsIgnoreCase("sair")) {
             System.out.println("\nFilme para busca: ");
@@ -40,28 +37,8 @@ public class Main {
                 break;
             }
 
-            //var apiKey = "sua chave de api aqui"
-            var adress = "http://www.omdbapi.com/?t=" + String.valueOf(titleToSearch.replace(" ", "+")) + "&apikey=" + apiKey;
-
             try {
-                HttpClient client = HttpClient.newHttpClient(); //iniciliza o HttpClient (faz a requisição)
-                HttpRequest request = HttpRequest.newBuilder().uri(URI.create(adress)).build(); //construtor para uma Classe muito complexa
-
-                //client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                //.thenApply(HttpResponse::body)
-                //.thenAccept(System.out::println)
-                //.join();
-
-                HttpResponse<String> response = client //recebe a resposta da requisição
-                        .send(request, HttpResponse.BodyHandlers.ofString());
-
-                var json = response.body();
-                //System.out.println(json);
-
-                var temp = gson.fromJson(json, TitleOmbd.class); //usado apenas para carregar os dados
-
-                var title = new Title(temp); //conversão de tipo de objeto
-
+                var title = new Title(apiResponse.service(titleToSearch));
                 titles.add(title);
                 System.out.println(title);
             } catch (NumberFormatException e) {
@@ -71,15 +48,13 @@ public class Main {
             } catch (ErroConversaoDeAnoException e) {
                 System.out.println(e.getMessage());
             }
-            //System.out.println("\nFinalizado corretamente");
         }
-        System.out.println("\nFilmes encontrados com sucesso: \n");
+        System.out.println("\nFilmes encontrados: \n");
         for (Title t : titles) {
             System.out.println(t.getName() + " (" + t.getYear() + ")");
         }
 
-        var writer = new FileWriter("titulos.json");
-        writer.write(gson.toJson(titles));
-        writer.close();
+        var writer = new Writer(titles);
+
     }
 }
